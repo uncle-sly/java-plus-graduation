@@ -44,7 +44,10 @@ public class RestStatClient implements StatClient {
                     .retrieve()
                     .onStatus(status -> status != HttpStatus.CREATED, (request, response) -> {
                         throw new InvalidRequestException(response.getStatusCode().value() + ": " + response.getBody());
-                    });
+                    })
+                    .body(ViewStats.class);
+
+
         } catch (Exception e) {
             log.warn("Ошибка при отправке hit-запроса: {}", e.getMessage());
         }
@@ -63,7 +66,8 @@ public class RestStatClient implements StatClient {
                     .onStatus(status -> status != HttpStatus.OK, (request, response) -> {
                         throw new InvalidRequestException(response.getStatusCode().value() + ": " + response.getBody());
                     })
-                    .body(new ParameterizedTypeReference<>() {
+//                    .body(new ParameterizedTypeReference<>() {
+                    .body(new ParameterizedTypeReference<List<ViewStats>>() {
                     });
         } catch (Exception e) {
             log.warn("Ошибка при получении статистики: {}", e.getMessage());
