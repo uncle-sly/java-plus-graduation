@@ -15,27 +15,30 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
+import java.net.URI;
 import java.util.List;
 
 @Slf4j
 @Component
 public class RestStatClient implements StatClient {
+    private static final String STAT_SERVER_ID = "stat-server";
+    private static final String HIT_ENDPOINT = "/hit";
+    private static final String STATS_ENDPOINT = "/stats";
+
     private final DiscoveryClient discoveryClient;
     private RestClient restClient;
+    private URI currentUri;
 
     @Autowired
     public RestStatClient(DiscoveryClient discoveryClient) {
         this.discoveryClient = discoveryClient;
     }
 
-
     @Override
     public void hit(ParamHitDto paramHitDto) {
         try {
-            this.restClient = RestClient.create(getInstance().getUri().toString());
-
-            restClient.post()
-                    .uri("/hit")
+            getRestClient().post()
+                    .uri(HIT_ENDPOINT)
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(paramHitDto)
                     .retrieve()
@@ -43,17 +46,14 @@ public class RestStatClient implements StatClient {
                         throw new InvalidRequestException(response.getStatusCode().value() + ": " + response.getBody());
                     });
         } catch (Exception e) {
-            log.info(e.getMessage());
+            log.warn("Ошибка при отправке hit-запроса: {}", e.getMessage());
         }
-
     }
 
     @Override
     public List<ViewStats> getStat(ParamDto paramDto) {
         try {
-            this.restClient = RestClient.create(getInstance().getUri().toString());
-
-            return restClient.get().uri(uriBuilder -> uriBuilder.path("/stats")
+            return getRestClient().get().uri(uriBuilder -> uriBuilder.path(STATS_ENDPOINT)
                             .queryParam("start", paramDto.getStart().toString())
                             .queryParam("end", paramDto.getEnd().toString())
                             .queryParam("uris", paramDto.getUris())
@@ -63,25 +63,33 @@ public class RestStatClient implements StatClient {
                     .onStatus(status -> status != HttpStatus.OK, (request, response) -> {
                         throw new InvalidRequestException(response.getStatusCode().value() + ": " + response.getBody());
                     })
-                    .body(new ParameterizedTypeReference<List<ViewStats>>() {
+                    .body(new ParameterizedTypeReference<>() {
                     });
         } catch (Exception e) {
-            log.info(e.getMessage());
+            log.warn("Ошибка при получении статистики: {}", e.getMessage());
             return List.of();
         }
     }
 
-
     private ServiceInstance getInstance() {
         try {
-            return discoveryClient
-                    .getInstances("stat-server")
+            return discoveryClient.getInstances(STAT_SERVER_ID)
                     .getFirst();
         } catch (Exception exception) {
-            throw new StatsServerUnavailable(
-                    "Ошибка обнаружения адреса сервиса статистики с id: " + "stat-server",
-                    exception
-            );
+            throw new StatsServerUnavailable("Ошибка обнаружения сервиса статистики: " + STAT_SERVER_ID, exception);
         }
     }
+
+    private RestClient getRestClient() {
+        ServiceInstance instance = getInstance();
+        URI newUri = instance.getUri();
+
+        if (restClient == null || !newUri.equals(currentUri)) {
+            log.info("Обновление URI RestClient с {} на {}", currentUri, newUri);
+            this.restClient = RestClient.create(newUri.toString());
+            this.currentUri = newUri;
+        }
+        return this.restClient;
+    }
+
 }
