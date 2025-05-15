@@ -1,9 +1,9 @@
 spring:
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:6543/ewm-main
-    username: main
-    password: main
+    url: jdbc:postgresql://localhost:6542/ewm-stats
+    username: stat
+    password: stat
 
   jpa:
     hibernate:
@@ -40,6 +40,6 @@ spring:
       on-profile: test
   datasource:
     driverClassName: org.h2.Driver
-    url: jdbc:h2:mem:ewm-main
-    username: main
-    password: main
+    url: jdbc:h2:mem:ewm-stats
+    username: stat
+    password: stat
