@@ -15,7 +15,7 @@ spring:
           predicates:
             - Path=/categories/**, /admin/**, /users/**, /events/**, /compilations/**
         - id: stats-server
-          uri: lb://stat-server
+          uri: lb://stats-server
           predicates:
             - Path=/hit/**, /stats/**
 

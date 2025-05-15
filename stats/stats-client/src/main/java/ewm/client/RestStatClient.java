@@ -21,7 +21,7 @@ import java.util.List;
 @Slf4j
 @Component
 public class RestStatClient implements StatClient {
-    private static final String STAT_SERVER_ID = "stat-server";
+    private static final String STAT_SERVER_ID = "stats-server";
     private static final String HIT_ENDPOINT = "/hit";
     private static final String STATS_ENDPOINT = "/stats";
 
@@ -44,9 +44,7 @@ public class RestStatClient implements StatClient {
                     .retrieve()
                     .onStatus(status -> status != HttpStatus.CREATED, (request, response) -> {
                         throw new InvalidRequestException(response.getStatusCode().value() + ": " + response.getBody());
-                    })
-                    .body(ViewStats.class);
-
+                    });
 
         } catch (Exception e) {
             log.warn("Ошибка при отправке hit-запроса: {}", e.getMessage());
@@ -66,8 +64,7 @@ public class RestStatClient implements StatClient {
                     .onStatus(status -> status != HttpStatus.OK, (request, response) -> {
                         throw new InvalidRequestException(response.getStatusCode().value() + ": " + response.getBody());
                     })
-//                    .body(new ParameterizedTypeReference<>() {
-                    .body(new ParameterizedTypeReference<List<ViewStats>>() {
+                    .body(new ParameterizedTypeReference<>() {
                     });
         } catch (Exception e) {
             log.warn("Ошибка при получении статистики: {}", e.getMessage());
