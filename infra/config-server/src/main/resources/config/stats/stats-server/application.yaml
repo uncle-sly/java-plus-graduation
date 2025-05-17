@@ -1,0 +1,45 @@
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:6542/ewm-stats
+    username: stat
+    password: stat
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+  sql:
+    init:
+      mode: always
+      database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+server:
+  port: 0
+
+#client:
+#  url: http://localhost:9090
+
+logging:
+  level:
+    org.springframework.orm.jpa: TRACE
+    org.springframework.orm.jpa.JpaTransactionManager: DEBUG
+    org.springframework.transaction: INFO
+    org.springframework.transaction.interceptor: TRACE
+    org.hibernate.sql: DEBUG
+    org.hibernate.orm.jdbc.bind: TRACE
+
+
+---
+spring:
+  config:
+    activate:
+      on-profile: test
+  datasource:
+    driverClassName: org.h2.Driver
+    url: jdbc:h2:mem:ewm-stats
+    username: stat
+    password: stat
