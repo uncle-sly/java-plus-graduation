@@ -5,8 +5,8 @@ import ewm.ParamHitDto;
 import ewm.ViewStats;
 import ewm.exception.InvalidRequestException;
 import ewm.exception.StatsServerUnavailable;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.core.ParameterizedTypeReference;
@@ -20,6 +20,7 @@ import java.util.List;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class RestStatClient implements StatClient {
     private static final String STAT_SERVER_ID = "stats-server";
     private static final String HIT_ENDPOINT = "/hit";
@@ -29,10 +30,6 @@ public class RestStatClient implements StatClient {
     private RestClient restClient;
     private URI currentUri;
 
-    @Autowired
-    public RestStatClient(DiscoveryClient discoveryClient) {
-        this.discoveryClient = discoveryClient;
-    }
 
     @Override
     public void hit(ParamHitDto paramHitDto) {
@@ -43,7 +40,7 @@ public class RestStatClient implements StatClient {
                     .body(paramHitDto)
                     .retrieve()
                     .onStatus(status -> status != HttpStatus.CREATED, (request, response) -> {
-                        throw new InvalidRequestException(response.getStatusCode().value() + ": " + response.getBody());
+                        throw new InvalidRequestException(InvalidRequestException.class, response.getStatusCode().value() + ": " + response.getBody());
                     });
 
         } catch (Exception e) {
@@ -62,7 +59,7 @@ public class RestStatClient implements StatClient {
                             .build())
                     .retrieve()
                     .onStatus(status -> status != HttpStatus.OK, (request, response) -> {
-                        throw new InvalidRequestException(response.getStatusCode().value() + ": " + response.getBody());
+                        throw new InvalidRequestException(InvalidRequestException.class, response.getStatusCode().value() + ": " + response.getBody());
                     })
                     .body(new ParameterizedTypeReference<>() {
                     });
@@ -72,13 +69,14 @@ public class RestStatClient implements StatClient {
         }
     }
 
-    private ServiceInstance getInstance() {
-        try {
-            return discoveryClient.getInstances(STAT_SERVER_ID)
-                    .getFirst();
-        } catch (Exception exception) {
-            throw new StatsServerUnavailable("Ошибка обнаружения сервиса статистики: " + STAT_SERVER_ID, exception);
+    private synchronized ServiceInstance getInstance() {
+        List<ServiceInstance> instances = discoveryClient.getInstances(STAT_SERVER_ID);
+
+        if (instances == null || instances.isEmpty()) {
+            log.warn("Не найдено ни одного экземпляра сервиса: {}", STAT_SERVER_ID);
+            throw new StatsServerUnavailable(StatsServerUnavailable.class, "Ошибка: сервис статистики не найден: " + STAT_SERVER_ID);
         }
+        return instances.getFirst();
     }
 
     private RestClient getRestClient() {
