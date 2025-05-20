@@ -1,7 +1,8 @@
 package ewm.event.dto;
 
 import ewm.category.dto.CategoryDto;
-import ewm.user.dto.UserShortDto;
+import ru.yandex.practicum.dto.user.UserDto;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,7 +15,7 @@ public class EventBaseDto {
     private CategoryDto category;
     private Long confirmedRequests;
     private Long id;
-    private UserShortDto initiator;
+    private UserDto initiator;
     private Boolean paid;
     private String title;
     private Long views;

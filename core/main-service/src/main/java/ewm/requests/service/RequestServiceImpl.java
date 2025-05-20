@@ -11,10 +11,12 @@ import ewm.requests.mapper.RequestMapper;
 import ewm.requests.model.Request;
 import ewm.requests.model.RequestStatus;
 import ewm.requests.repository.RequestRepository;
-import ewm.user.repository.UserRepository;
+import feign.FeignException;
 import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.dto.user.UserDto;
+import ru.yandex.practicum.feignClient.user.UserClient;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -23,7 +25,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class RequestServiceImpl implements RequestService {
-    private final UserRepository userRepository;
+    private final UserClient userClient;
     private final RequestRepository requestRepository;
     private final RequestMapper requestMapper;
     private final EventRepository eventRepository;
@@ -52,7 +54,7 @@ public class RequestServiceImpl implements RequestService {
         }
 
         Request request = new Request();
-        request.setRequester(userRepository.findById(userId).get());
+        request.setRequesterId(findUser(userId).getId());
         request.setEvent(event);
 
         Long confirmedRequests = requestRepository.countRequestsByEventAndStatus(event, RequestStatus.CONFIRMED);
@@ -87,7 +89,7 @@ public class RequestServiceImpl implements RequestService {
     public List<ParticipationRequestDto> getEventRequests(Long userId, Long eventId) {
         List<Event> userEvents = eventRepository.findAllByInitiatorId(userId);
         Event event = userEvents.stream()
-                .filter(e -> e.getInitiator().getId().equals(userId))
+                .filter(e -> e.getInitiatorId().equals(userId))
                 .findFirst()
                 .orElseThrow(() -> new ValidationException("Пользователь с ID - " + userId + ", не является инициатором события с ID - " + eventId + "."));
         return requestRepository.findByEventId(event.getId()).stream()
@@ -153,4 +155,13 @@ public class RequestServiceImpl implements RequestService {
         resultRequest.setRejectedRequests(rejectedRequests);
         return resultRequest;
     }
+
+    private UserDto findUser(Long userId) {
+        try {
+            return userClient.getUserById(userId);
+        } catch (FeignException e) {
+            throw new EntityNotFoundException(UserDto.class, "Пользователь c ID - " + userId + ", не найден.");
+        }
+    }
+
 }

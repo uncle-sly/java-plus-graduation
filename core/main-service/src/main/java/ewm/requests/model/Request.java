@@ -1,7 +1,7 @@
 package ewm.requests.model;
 
 import ewm.event.model.Event;
-import ewm.user.model.User;
+//import ewm.user.model.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,14 +18,19 @@ public class Request {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @ManyToOne
     @JoinColumn(name = "event_id")
     private Event event;
-    @ManyToOne
-    @JoinColumn(name = "requester_id")
-    private User requester;
+
+//    @ManyToOne
+//@JoinColumn(name = "requester_id")
+    @Column(name = "requester_id")
+    private Long requesterId;
+
     @Column(name = "created_at")
     private LocalDateTime createdOn;
+
     @Enumerated(EnumType.STRING)
     private RequestStatus status;
 }

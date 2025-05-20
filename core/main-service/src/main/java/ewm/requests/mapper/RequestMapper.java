@@ -11,7 +11,7 @@ import static ewm.utility.Constants.FORMAT_DATETIME;
 public interface RequestMapper {
 
     @Mapping(target = "event", source = "event.id")
-    @Mapping(target = "requester", source = "requester.id")
+    @Mapping(target = "requester", source = "requesterId")
     @Mapping(target = "created", source = "createdOn", dateFormat = FORMAT_DATETIME)
     ParticipationRequestDto toParticipationRequestDto(Request request);
 }

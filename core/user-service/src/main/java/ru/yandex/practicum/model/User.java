@@ -1,4 +1,4 @@
-package ewm.user.model;
+package ru.yandex.practicum.model;
 
 import jakarta.persistence.*;
 import lombok.*;

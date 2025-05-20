@@ -1,12 +1,13 @@
-package ewm.user.controller;
+package ru.yandex.practicum.controller;
 
-import ewm.user.dto.UserDto;
-import ewm.user.service.UserService;
+
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.dto.user.UserDto;
+import ru.yandex.practicum.service.UserService;
 
 import java.util.List;
 

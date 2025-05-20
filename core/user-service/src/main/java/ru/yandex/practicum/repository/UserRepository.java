@@ -1,8 +1,8 @@
-package ewm.user.repository;
+package ru.yandex.practicum.repository;
 
-import ewm.user.model.User;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import ru.yandex.practicum.model.User;
 
 import java.util.List;
 

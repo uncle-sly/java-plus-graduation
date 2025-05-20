@@ -17,12 +17,13 @@ import ewm.exception.ValidationException;
 import ewm.requests.model.Request;
 import ewm.requests.model.RequestStatus;
 import ewm.requests.repository.RequestRepository;
-import ewm.user.model.User;
-import ewm.user.repository.UserRepository;
+import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.dto.user.UserDto;
+import ru.yandex.practicum.feignClient.user.UserClient;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -37,7 +38,7 @@ public class EventServiceImpl implements EventService {
     private final EventRepository eventRepository;
     private final EventMapper eventMapper;
     private final RestStatClient statClient;
-    private final UserRepository userRepository;
+    private final UserClient userClient;
     private final CategoryRepository categoryRepository;
     private final LocationRepository locationRepository;
     private final RequestRepository requestRepository;
@@ -127,8 +128,8 @@ public class EventServiceImpl implements EventService {
         if (eventDate.isBefore(LocalDateTime.now().plusHours(2))) {
             throw new ValidationException(NewEventDto.class, "До начала события осталось меньше двух часов");
         }
-        User initiator = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException(User.class, "Пользователь не найден"));
+        UserDto initiator = findUser(userId);
+
         Category category = categoryRepository.findById(newEventDto.getCategory())
                 .orElseThrow(() -> new EntityNotFoundException(Category.class, "Категория не найден"));
 
@@ -142,7 +143,7 @@ public class EventServiceImpl implements EventService {
         if (newEventDto.getParticipantLimit() == null) {
             event.setParticipantLimit(0L);
         }
-        event.setInitiator(initiator);
+        event.setInitiatorId(initiator.getId());
         event.setCategory(category);
         event.setCreatedOn(LocalDateTime.now());
         event.setState(EventState.PENDING);
@@ -183,8 +184,7 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public List<EventShortDto> findUserEvents(Long userId, Integer from, Integer size) {
-        User initiator = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException(User.class, "Пользователь не найден"));
+        findUser(userId);
         Pageable pageable = PageRequest.of(from, size);
         List<Event> events = eventRepository.findAllByInitiatorId(userId, pageable);
         List<EventFullDto> eventFullDtos = eventMapper.toEventFullDtos(events);
@@ -193,8 +193,7 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public EventFullDto findUserEventById(Long userId, Long eventId) {
-        User initiator = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException(User.class, "Пользователь не найден"));
+        findUser(userId);
         Event event = eventRepository.findByIdAndInitiatorId(eventId, userId)
                 .orElseThrow(() -> new EntityNotFoundException(Event.class, "Событие не найдено"));
         EventFullDto result = eventMapper.toEventFullDto(event);
@@ -203,8 +202,7 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public EventFullDto updateEventByUser(Long userId, Long eventId, UpdateEventUserRequest updateRequest) {
-        User initiator = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException(User.class, "Пользователь не найден"));
+        findUser(userId);
         Event event = eventRepository.findByIdAndInitiatorId(eventId, userId)
                 .orElseThrow(() -> new EntityNotFoundException(Event.class, "Событие не найдено"));
         if (event.getState() == EventState.PUBLISHED) {
@@ -317,4 +315,13 @@ public class EventServiceImpl implements EventService {
         );
         return eventDto;
     }
+
+    private UserDto findUser(Long userId) {
+        try {
+            return userClient.getUserById(userId);
+        } catch (FeignException e) {
+            throw new EntityNotFoundException(UserDto.class, "Пользователь c ID - " + userId + ", не найден.");
+        }
+    }
+
 }

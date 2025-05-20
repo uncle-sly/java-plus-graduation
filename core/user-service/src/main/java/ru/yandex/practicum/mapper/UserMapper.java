@@ -1,9 +1,10 @@
-package ewm.user.mapper;
+package ru.yandex.practicum.mapper;
 
-import ewm.user.dto.UserDto;
-import ewm.user.dto.UserShortDto;
-import ewm.user.model.User;
+
 import org.mapstruct.Mapper;
+import ru.yandex.practicum.dto.UserShortDto;
+import ru.yandex.practicum.dto.user.UserDto;
+import ru.yandex.practicum.model.User;
 
 import java.util.List;
 

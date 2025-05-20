@@ -23,6 +23,8 @@ public interface EventMapper {
 
     @Mapping(target = "views", ignore = true)
     @Mapping(target = "confirmedRequests", ignore = true)
+    @Mapping(target = "initiator.id", source = "initiatorId")
+    @Mapping(target = "commentsCount", ignore = true)
     EventFullDto toEventFullDto(Event event);
 
     @Mapping(target = "views", ignore = true)
@@ -34,8 +36,9 @@ public interface EventMapper {
     @Mapping(target = "createdOn", ignore = true)
     @Mapping(target = "eventDate", source = "eventDate")
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "initiator", ignore = true)
+    @Mapping(target = "initiatorId", ignore = true)
     @Mapping(target = "state", ignore = true)
+    @Mapping(target = "location.id", ignore = true)
     Event toEvent(NewEventDto newEventDto);
 
     List<EventShortDto> toEventShortDtos(List<EventFullDto> eventFullDtos);
