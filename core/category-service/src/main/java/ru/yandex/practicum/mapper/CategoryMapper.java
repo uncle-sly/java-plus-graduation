@@ -1,10 +1,10 @@
-package ewm.category.mapper;
+package ru.yandex.practicum.mapper;
 
-import ewm.category.dto.CategoryDto;
-import ewm.category.dto.NewCategoryDto;
-import ewm.category.model.Category;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import ru.yandex.practicum.dto.NewCategoryDto;
+import ru.yandex.practicum.dto.category.CategoryDto;
+import ru.yandex.practicum.model.Category;
 
 import java.util.List;
 

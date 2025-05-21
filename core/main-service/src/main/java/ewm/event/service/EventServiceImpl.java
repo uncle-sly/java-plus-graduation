@@ -1,8 +1,6 @@
 package ewm.event.service;
 
 import ewm.ParamDto;
-import ewm.category.model.Category;
-import ewm.category.repository.CategoryRepository;
 import ewm.client.RestStatClient;
 import ewm.comment.repository.CommentRepository;
 import ewm.event.dto.*;
@@ -22,7 +20,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.dto.category.CategoryDto;
 import ru.yandex.practicum.dto.user.UserDto;
+import ru.yandex.practicum.feignClient.category.CategoryClient;
 import ru.yandex.practicum.feignClient.user.UserClient;
 
 import java.time.LocalDateTime;
@@ -39,7 +39,7 @@ public class EventServiceImpl implements EventService {
     private final EventMapper eventMapper;
     private final RestStatClient statClient;
     private final UserClient userClient;
-    private final CategoryRepository categoryRepository;
+    private final CategoryClient categoryClient;
     private final LocationRepository locationRepository;
     private final RequestRepository requestRepository;
     private final CommentRepository commentRepository;
@@ -130,8 +130,7 @@ public class EventServiceImpl implements EventService {
         }
         UserDto initiator = findUser(userId);
 
-        Category category = categoryRepository.findById(newEventDto.getCategory())
-                .orElseThrow(() -> new EntityNotFoundException(Category.class, "Категория не найден"));
+        CategoryDto category = findCategory(newEventDto.getCategory());
 
         Event event = eventMapper.toEvent(newEventDto);
         if (newEventDto.getPaid() == null) {
@@ -144,7 +143,7 @@ public class EventServiceImpl implements EventService {
             event.setParticipantLimit(0L);
         }
         event.setInitiatorId(initiator.getId());
-        event.setCategory(category);
+        event.setCategoryId(category.getId());
         event.setCreatedOn(LocalDateTime.now());
         event.setState(EventState.PENDING);
         event.setLocation(locationRepository.save(event.getLocation()));
@@ -268,9 +267,8 @@ public class EventServiceImpl implements EventService {
             event.setAnnotation(updateRequest.getAnnotation());
         }
         if (updateRequest.getCategory() != null) {
-            Category category = categoryRepository.findById(updateRequest.getCategory())
-                    .orElseThrow(() -> new EntityNotFoundException(Category.class, "Категория не найдена"));
-            event.setCategory(category);
+            CategoryDto category = findCategory(updateRequest.getCategory());
+            event.setCategoryId(category.getId());
         }
         if (updateRequest.getDescription() != null && !updateRequest.getDescription().isBlank()) {
             event.setDescription(updateRequest.getDescription());
@@ -321,6 +319,14 @@ public class EventServiceImpl implements EventService {
             return userClient.getUserById(userId);
         } catch (FeignException e) {
             throw new EntityNotFoundException(UserDto.class, "Пользователь c ID - " + userId + ", не найден.");
+        }
+    }
+
+    private CategoryDto findCategory(Long categoryId) {
+        try {
+            return categoryClient.getCategoryById(categoryId);
+        } catch (FeignException e) {
+            throw new EntityNotFoundException(CategoryDto.class, "Категория c ID - " + categoryId + " не найдена");
         }
     }
 

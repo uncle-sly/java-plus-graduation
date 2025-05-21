@@ -1,13 +1,13 @@
-package ewm.category.controller;
+package ru.yandex.practicum.controller;
 
-import ewm.category.dto.CategoryDto;
-import ewm.category.dto.NewCategoryDto;
-import ewm.category.service.CategoryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.dto.NewCategoryDto;
+import ru.yandex.practicum.dto.category.CategoryDto;
+import ru.yandex.practicum.service.CategoryService;
 
 @RestController
 @RequiredArgsConstructor

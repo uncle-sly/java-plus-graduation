@@ -1,9 +1,9 @@
-package ewm.category.controller;
+package ru.yandex.practicum.controller;
 
-import ewm.category.dto.CategoryDto;
-import ewm.category.service.CategoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.dto.category.CategoryDto;
+import ru.yandex.practicum.service.CategoryService;
 
 import java.util.List;
 
@@ -23,4 +23,5 @@ public class PublicCategoryController {
     public CategoryDto getCategoryById(@PathVariable Long id) {
         return categoryService.getCategoryById(id);
     }
+
 }

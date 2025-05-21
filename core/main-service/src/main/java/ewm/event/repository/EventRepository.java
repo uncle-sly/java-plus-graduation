@@ -20,7 +20,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             WHERE (?1 IS NULL OR (e.title ILIKE ?1
             OR e.description ILIKE ?1
             OR e.annotation ILIKE ?1))
-            AND (?2 IS NULL OR e.category.id IN ?2)
+            AND (?2 IS NULL OR e.categoryId IN ?2)
             AND (?3 IS NULL OR e.paid = ?3)
             AND e.eventDate BETWEEN ?4 AND ?5
             AND (?6 IS NULL OR e.state = 'PUBLISHED')
@@ -37,7 +37,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             SELECT e FROM Event e
             WHERE (:users IS NULL OR e.initiatorId IN :users)
             AND (:states IS NULL OR e.state IN :states)
-            AND (:categories IS NULL OR e.category.id IN :categories)
+            AND (:categories IS NULL OR e.categoryId IN :categories)
             AND e.eventDate BETWEEN :rangeStart AND :rangeEnd
             """)
     List<Event> findAdminEvents(List<Long> users,

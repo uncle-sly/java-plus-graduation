@@ -1,6 +1,6 @@
 package ewm.event.dto;
 
-import ewm.category.dto.CategoryDto;
+import ru.yandex.practicum.dto.category.CategoryDto;
 import ru.yandex.practicum.dto.user.UserDto;
 
 import lombok.AllArgsConstructor;
