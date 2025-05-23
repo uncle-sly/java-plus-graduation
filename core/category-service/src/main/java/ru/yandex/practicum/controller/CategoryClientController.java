@@ -6,7 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.dto.category.CategoryDto;
-import ru.yandex.practicum.feignClient.category.CategoryClient;
+import ru.yandex.practicum.feignClient.CategoryOperationsClient;
 import ru.yandex.practicum.service.CategoryService;
 
 import java.util.List;
@@ -15,7 +15,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/category")
 @Slf4j
-public class CategoryClientController implements CategoryClient {
+public class CategoryClientController implements CategoryOperationsClient {
 
     private final CategoryService categoryService;
 

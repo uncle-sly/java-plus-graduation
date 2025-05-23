@@ -5,6 +5,7 @@ import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import ru.yandex.practicum.dto.event.LocationDto;
 
 @Data
 @AllArgsConstructor

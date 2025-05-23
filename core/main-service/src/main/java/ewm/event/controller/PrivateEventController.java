@@ -1,6 +1,6 @@
 package ewm.event.controller;
 
-import ewm.event.dto.EventFullDto;
+import ru.yandex.practicum.dto.event.EventFullDto;
 import ewm.event.dto.EventShortDto;
 import ewm.event.dto.NewEventDto;
 import ewm.event.dto.UpdateEventUserRequest;

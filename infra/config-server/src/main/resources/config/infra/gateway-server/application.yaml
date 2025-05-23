@@ -25,17 +25,15 @@ spring:
           predicates:
             - Path=/admin/categories/**, /categories/**
 
+        - id: request-service-route
+          uri: lb://request-service
+          predicates:
+            - Path=/users/{userId}/requests/**, /users/{userId}/events/{eventId}/requests/**
+
         - id: main-service
           uri: lb://main-service
           predicates:
-#            - Path=/users/**, /events/**, /compilations/**
             - Path=/**
-
-
-#        - id: shopping_cart_service_route
-#          uri: lb://shopping-cart
-#          predicates:
-#            - Path=/shopping-cart/**
 
 management:
   endpoint:

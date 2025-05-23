@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ru.yandex.practicum.exception.EntityNotFoundException;
+import ru.yandex.practicum.exception.InitiatorRequestException;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -82,6 +83,18 @@ public class ErrorHandlerControllerAdvice {
         String stackTrace = sw.toString();
         return new ApiError("CONFLICT", "Integrity constraint has been violated", stackTrace, LocalDateTime.now().toString());
     }
+
+    @ExceptionHandler(InitiatorRequestException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ApiError onInitiatorRequestException(final InitiatorRequestException e) {
+        log.error("409: {}", e.getMessage(), e);
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        e.printStackTrace(pw);
+        String stackTrace = sw.toString();
+        return new ApiError("CONFLICT", "event is not published", stackTrace, LocalDateTime.now().toString());
+    }
+
 
     @ExceptionHandler(Throwable.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)

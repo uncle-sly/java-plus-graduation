@@ -1,7 +1,7 @@
 package ewm.event.controller;
 
 import ewm.event.dto.AdminEventParams;
-import ewm.event.dto.EventFullDto;
+import ru.yandex.practicum.dto.event.EventFullDto;
 import ewm.event.dto.UpdateEventAdminRequest;
 import ewm.event.service.EventService;
 import jakarta.validation.Valid;
@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static ewm.utility.Constants.FORMAT_DATETIME;
+import static ru.yandex.practicum.utility.Constants.FORMAT_DATETIME;
 
 @RestController
 @RequestMapping(path = "/admin/events")

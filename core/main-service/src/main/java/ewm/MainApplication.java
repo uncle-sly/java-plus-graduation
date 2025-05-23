@@ -8,10 +8,11 @@ import org.springframework.context.ConfigurableApplicationContext;
 
 @SpringBootApplication
 @EnableDiscoveryClient
-@EnableFeignClients(basePackages = "ru.yandex.practicum")
-//@EnableFeignClients
+@EnableFeignClients
 public class MainApplication {
+
     public static void main(String[] args) {
         ConfigurableApplicationContext context = SpringApplication.run(MainApplication.class, args);
     }
+
 }

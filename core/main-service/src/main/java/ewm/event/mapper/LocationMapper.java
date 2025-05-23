@@ -1,6 +1,6 @@
 package ewm.event.mapper;
 
-import ewm.event.dto.LocationDto;
+import ru.yandex.practicum.dto.event.LocationDto;
 import ewm.event.model.Location;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

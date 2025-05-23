@@ -6,20 +6,20 @@ import ewm.comment.dto.UpdateCommentDto;
 import ewm.comment.mapper.CommentMapper;
 import ewm.comment.model.Comment;
 import ewm.comment.repository.CommentRepository;
+import ewm.event.feignClient.RequestClient;
+import ewm.event.feignClient.UserClient;
 import ewm.event.model.Event;
-import ewm.event.model.EventState;
+import ru.yandex.practicum.dto.event.EventState;
 import ewm.event.repository.EventRepository;
 import ewm.exception.EntityNotFoundException;
 import ewm.exception.InitiatorRequestException;
 import ewm.exception.ValidationException;
-import ewm.requests.repository.RequestRepository;
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.dto.user.UserDto;
-import ru.yandex.practicum.feignClient.user.UserClient;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -30,9 +30,9 @@ public class CommentServiceImpl implements CommentService {
 
     private final CommentRepository commentRepository;
     private final EventRepository eventRepository;
-    private final RequestRepository requestRepository;
     private final CommentMapper commentMapper;
     private final UserClient userClient;
+    private final RequestClient requestClient;
 
 
     @Override
@@ -41,7 +41,7 @@ public class CommentServiceImpl implements CommentService {
         if (event.getId().equals(userId)) {
             throw new ValidationException(Comment.class, " Нельзя оставлять комментарии к своему событию.");
         }
-        if (requestRepository.findByRequesterIdAndEventId(userId, eventId).isEmpty()) {
+        if (requestClient.findByRequestIdAndEventId(userId, eventId).isEmpty()) {
             throw new ValidationException(Comment.class, " Пользователь с ID - " + userId + ", не заявился на событие с ID - " + eventId + ".");
         }
         UserDto author = findUser(userId);

@@ -9,10 +9,11 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
+import ru.yandex.practicum.dto.event.LocationDto;
 
 import java.time.LocalDateTime;
 
-import static ewm.utility.Constants.FORMAT_DATETIME;
+import static ru.yandex.practicum.utility.Constants.FORMAT_DATETIME;
 
 @Data
 @AllArgsConstructor

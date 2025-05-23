@@ -1,6 +1,6 @@
 package ewm.event.mapper;
 
-import ewm.event.dto.EventFullDto;
+import ru.yandex.practicum.dto.event.EventFullDto;
 import ewm.event.dto.EventShortDto;
 import ewm.event.dto.NewEventDto;
 import ewm.event.model.Event;
@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-import static ewm.utility.Constants.FORMAT_DATETIME;
+import static ru.yandex.practicum.utility.Constants.FORMAT_DATETIME;
 
 @Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface EventMapper {

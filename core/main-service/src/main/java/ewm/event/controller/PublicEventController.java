@@ -2,7 +2,7 @@ package ewm.event.controller;
 
 import ewm.ParamHitDto;
 import ewm.client.RestStatClient;
-import ewm.event.dto.EventFullDto;
+import ru.yandex.practicum.dto.event.EventFullDto;
 import ewm.event.dto.EventShortDto;
 import ewm.event.dto.ReqParam;
 import ewm.event.model.EventSort;
@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static ewm.utility.Constants.FORMAT_DATETIME;
+import static ru.yandex.practicum.utility.Constants.FORMAT_DATETIME;
 
 @RestController
 @RequestMapping("/events")

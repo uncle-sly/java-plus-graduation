@@ -4,6 +4,9 @@ import ewm.ParamDto;
 import ewm.client.RestStatClient;
 import ewm.comment.repository.CommentRepository;
 import ewm.event.dto.*;
+import ewm.event.feignClient.CategoryClient;
+import ewm.event.feignClient.RequestClient;
+import ewm.event.feignClient.UserClient;
 import ewm.event.mapper.EventMapper;
 import ewm.event.model.*;
 import ewm.event.repository.EventRepository;
@@ -12,9 +15,10 @@ import ewm.exception.ConditionNotMetException;
 import ewm.exception.EntityNotFoundException;
 import ewm.exception.InitiatorRequestException;
 import ewm.exception.ValidationException;
-import ewm.requests.model.Request;
-import ewm.requests.model.RequestStatus;
-import ewm.requests.repository.RequestRepository;
+import ru.yandex.practicum.dto.event.EventFullDto;
+import ru.yandex.practicum.dto.event.EventState;
+import ru.yandex.practicum.dto.requests.ParticipationRequestDto;
+import ru.yandex.practicum.dto.requests.RequestStatus;
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -22,15 +26,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.dto.category.CategoryDto;
 import ru.yandex.practicum.dto.user.UserDto;
-import ru.yandex.practicum.feignClient.category.CategoryClient;
-import ru.yandex.practicum.feignClient.user.UserClient;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static ewm.utility.Constants.FORMAT_DATETIME;
+import static ru.yandex.practicum.utility.Constants.FORMAT_DATETIME;
 
 @Service
 @RequiredArgsConstructor
@@ -41,7 +43,7 @@ public class EventServiceImpl implements EventService {
     private final UserClient userClient;
     private final CategoryClient categoryClient;
     private final LocationRepository locationRepository;
-    private final RequestRepository requestRepository;
+    private final RequestClient requestClient;
     private final CommentRepository commentRepository;
 
     @Override
@@ -226,6 +228,41 @@ public class EventServiceImpl implements EventService {
         return eventMapper.toEventFullDto(eventRepository.save(event));
     }
 
+    @Override
+    public EventFullDto findById(Long id) {
+        Event event = eventRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(Event.class, " c ID = " + id + ", не найдено."));
+        EventFullDto result = eventMapper.toEventFullDto(event);
+        return addRequests(addViews(result));
+    }
+
+    @Override
+    public EventFullDto findByIdAndInitiatorId(Long eventId, Long initiatorId) {
+        Event event = eventRepository.findByIdAndInitiatorId(eventId, initiatorId)
+                .orElseThrow(() -> new EntityNotFoundException(Event.class, "Событие не найдено"));
+        EventFullDto result = eventMapper.toEventFullDto(event);
+        return addRequests(addViews(result));
+    }
+
+    @Override
+    public List<EventFullDto> findAllByInitiatorId(Long initiatorId) {
+        List<Event> events = eventRepository.findAllByInitiatorId(initiatorId);
+        List<EventFullDto> result = eventMapper.toEventFullDtos(events);
+        return addViews(result);
+
+    }
+
+    @Override
+    public Boolean findEventsWithCategory(Long id) {
+        return !eventRepository.findAllByCategoryId(id).isEmpty();
+    }
+
+    @Override
+    public Boolean findEventWithInitiatorId(Long eventId, Long initiatorId) {
+        return eventRepository.findByIdAndInitiatorId(eventId, initiatorId).isPresent();
+    }
+
+
     private List<EventFullDto> addViews(List<EventFullDto> eventDtos) {
         HashMap<String, EventFullDto> eventDtoMap = new HashMap<>();
         List<String> gettingUris = new ArrayList<>();
@@ -300,16 +337,16 @@ public class EventServiceImpl implements EventService {
 
     private List<EventFullDto> addRequests(List<EventFullDto> eventDtos) {
         List<Long> eventIds = eventDtos.stream().map(EventFullDto::getId).toList();
-        List<Request> requests = requestRepository.findAllByEventIdInAndStatus(eventIds, RequestStatus.CONFIRMED);
+        List<ParticipationRequestDto> requests = findAllByEventIdInAndStatus(eventIds, RequestStatus.CONFIRMED);
         Map<Long, Long> requestsMap = requests.stream()
-                .collect(Collectors.groupingBy(request -> request.getEvent().getId(), Collectors.counting()));
+                .collect(Collectors.groupingBy(ParticipationRequestDto::getEvent, Collectors.counting()));
         eventDtos.forEach(eventDto -> eventDto.setConfirmedRequests(requestsMap.getOrDefault(eventDto.getId(), 0L)));
         return eventDtos;
     }
 
     private EventFullDto addRequests(EventFullDto eventDto) {
         eventDto.setConfirmedRequests(
-                requestRepository.countByEventIdAndStatus(eventDto.getId(), RequestStatus.CONFIRMED)
+                requestClient.countRequestsByEventAndStatus(eventDto.getId(), RequestStatus.CONFIRMED)
         );
         return eventDto;
     }
@@ -327,6 +364,14 @@ public class EventServiceImpl implements EventService {
             return categoryClient.getCategoryById(categoryId);
         } catch (FeignException e) {
             throw new EntityNotFoundException(CategoryDto.class, "Категория c ID - " + categoryId + " не найдена");
+        }
+    }
+
+    private List<ParticipationRequestDto> findAllByEventIdInAndStatus(List<Long> ids, RequestStatus status) {
+        try {
+            return requestClient.findAllByEventIdInAndStatus(ids, status);
+        } catch (FeignException e) {
+            throw new EntityNotFoundException(CategoryDto.class, "Запросы - не найдены");
         }
     }
 
