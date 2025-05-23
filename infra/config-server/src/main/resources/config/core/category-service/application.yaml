@@ -1,7 +1,7 @@
 spring:
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:6543/ewm-main
+    url: jdbc:postgresql://localhost:6543/category
     username: main
     password: main
 
