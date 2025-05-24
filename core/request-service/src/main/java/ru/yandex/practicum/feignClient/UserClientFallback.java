@@ -13,7 +13,7 @@ public class UserClientFallback implements UserClient {
     @Override
     public UserDto getUserById(Long id) throws FeignException {
         throw new EntityNotFoundException(UserClientFallback.class,
-                "Пользователь с ID: " + id + "не обнаружен.");
+                "Пользователь с ID: " + id + " не обнаружен.");
     }
 
     @Override

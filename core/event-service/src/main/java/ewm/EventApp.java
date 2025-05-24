@@ -9,10 +9,10 @@ import org.springframework.context.ConfigurableApplicationContext;
 @SpringBootApplication
 @EnableDiscoveryClient
 @EnableFeignClients
-public class MainApplication {
+public class EventApp {
 
     public static void main(String[] args) {
-        ConfigurableApplicationContext context = SpringApplication.run(MainApplication.class, args);
+        ConfigurableApplicationContext context = SpringApplication.run(EventApp.class, args);
     }
 
 }

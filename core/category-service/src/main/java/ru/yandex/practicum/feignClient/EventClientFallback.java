@@ -13,13 +13,13 @@ public class EventClientFallback implements EventClient {
     @Override
     public EventFullDto findByIdAndInitiatorId(Long eventId, Long initiatorId) throws FeignException {
         throw new EntityNotFoundException(EventClientFallback.class,
-                "Событие с ID: " + eventId + ", Инициатор с ID: " + initiatorId + "не обнаружено.");
+                "Событие с ID: " + eventId + ", Инициатор с ID: " + initiatorId + " не обнаружено.");
     }
 
     @Override
     public EventFullDto findById(Long id) throws FeignException {
         throw new EntityNotFoundException(EventClientFallback.class,
-                "Событие с ID: " + id + "не обнаружено.");
+                "Событие с ID: " + id + " не обнаружено.");
     }
 
     @Override

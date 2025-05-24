@@ -30,8 +30,8 @@ spring:
           predicates:
             - Path=/users/{userId}/requests/**, /users/{userId}/events/{eventId}/requests/**
 
-        - id: main-service
-          uri: lb://main-service
+        - id: event-service-route
+          uri: lb://event-service
           predicates:
             - Path=/**
 

@@ -13,7 +13,7 @@ public class CategoryClientFallback implements CategoryClient {
     @Override
     public CategoryDto getCategoryById(Long id) throws FeignException {
         throw new EntityNotFoundException(CategoryClientFallback.class,
-                "Категория с ID: " + id + "не обнаружена.");
+                "Категория с ID: " + id + " не обнаружена.");
     }
 
     @Override
