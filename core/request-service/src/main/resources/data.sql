@@ -1,0 +1,4 @@
+DELETE FROM requests;
+
+ALTER TABLE requests ALTER COLUMN id RESTART WITH 1;
+

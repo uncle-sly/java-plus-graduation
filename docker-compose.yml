@@ -22,7 +22,9 @@ services:
     environment:
       - POSTGRES_USER=main
       - POSTGRES_PASSWORD=main
-      - POSTGRES_DB=ewm-main
+      - POSTGRES_DB=event
+    volumes:
+      - ./init-multiple-dbs:/docker-entrypoint-initdb.d
     healthcheck:
       test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
       timeout: 5s
