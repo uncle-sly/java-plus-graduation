@@ -5,6 +5,12 @@ spring:
     username: main
     password: main
 
+  cloud:
+    openfeign:
+      circuitbreaker:
+        enabled: true
+        alphanumeric-ids:
+          enabled: true
   jpa:
     hibernate:
       ddl-auto: none
@@ -20,8 +26,11 @@ spring:
 server:
   port: 0
 
-#client:
-#  url: http://localhost:9090
+resilience4j.circuitbreaker:
+  configs:
+    default:
+      slidingWindowSize: 50
+      failureRateThreshold: 50
 
 logging:
   level:
