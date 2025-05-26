@@ -1,9 +1,9 @@
 package ewm.event.controller;
 
 import ewm.event.dto.AdminEventParams;
+import ewm.event.service.AdminEventService;
 import ru.yandex.practicum.dto.event.EventFullDto;
 import ewm.event.dto.UpdateEventAdminRequest;
-import ewm.event.service.EventService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -21,7 +21,7 @@ import static ru.yandex.practicum.utility.Constants.FORMAT_DATETIME;
 @Validated
 public class AdminEventController {
 
-    private final EventService eventService;
+    private final AdminEventService eventService;
 
     @GetMapping
     public List<EventFullDto> adminGetAllEvents(

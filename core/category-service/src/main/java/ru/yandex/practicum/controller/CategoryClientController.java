@@ -21,13 +21,11 @@ public class CategoryClientController implements CategoryOperationsClient {
 
     @Override
     public CategoryDto getCategoryById(Long id) throws FeignException {
-        log.info("get category by id: {}", id);
         return categoryService.getCategoryById(id);
     }
 
     @Override
     public List<CategoryDto> getCategorysList(List<Long> ids) throws FeignException {
-        log.info("get categorys list: {}", ids);
         return categoryService.getCategorysList(ids);
     }
 

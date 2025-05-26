@@ -25,7 +25,7 @@ public class RequestClientFallback implements RequestClient {
     @Override
     public Optional<ParticipationRequestDto> findByRequestIdAndEventId(Long requestId, Long eventId) throws FeignException {
         throw new EntityNotFoundException(RequestClientFallback.class,
-                "Запрос с ID: " + requestId + ", на Событие с ID: " + eventId + " не обнаружен.");
+                "Запрос с ID: %d, на Событие с ID: %d не обнаружен.".formatted(requestId, eventId));
     }
 
 }

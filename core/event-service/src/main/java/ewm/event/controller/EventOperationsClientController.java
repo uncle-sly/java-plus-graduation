@@ -1,7 +1,7 @@
 package ewm.event.controller;
 
 import ru.yandex.practicum.dto.event.EventFullDto;
-import ewm.event.service.EventService;
+import ewm.event.service.InternalEventService;
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,7 +15,7 @@ import java.util.List;
 @RequestMapping("/api/v1/event")
 public class EventOperationsClientController implements EventOperationsClient {
 
-    private final EventService eventService;
+    private final InternalEventService eventService;
 
     @Override
     public EventFullDto findByIdAndInitiatorId(Long eventId, Long initiatorId) throws FeignException {

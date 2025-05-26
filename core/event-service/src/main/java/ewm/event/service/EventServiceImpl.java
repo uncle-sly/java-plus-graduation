@@ -36,7 +36,8 @@ import static ru.yandex.practicum.utility.Constants.FORMAT_DATETIME;
 
 @Service
 @RequiredArgsConstructor
-public class EventServiceImpl implements EventService {
+public class EventServiceImpl implements InternalEventService, PublicEventService, PrivateEventService, AdminEventService {
+
     private final EventRepository eventRepository;
     private final EventMapper eventMapper;
     private final RestStatClient statClient;

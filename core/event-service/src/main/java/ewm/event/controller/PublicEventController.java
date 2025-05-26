@@ -2,11 +2,11 @@ package ewm.event.controller;
 
 import ewm.ParamHitDto;
 import ewm.client.RestStatClient;
+import ewm.event.service.PublicEventService;
 import ru.yandex.practicum.dto.event.EventFullDto;
 import ewm.event.dto.EventShortDto;
 import ewm.event.dto.ReqParam;
 import ewm.event.model.EventSort;
-import ewm.event.service.EventService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -16,14 +16,14 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static ru.yandex.practicum.utility.Constants.FORMAT_DATETIME;
+import static ru.yandex.practicum.utility.Constants.MAIN_SERVICE;
 
 @RestController
 @RequestMapping("/events")
 @RequiredArgsConstructor
 public class PublicEventController {
 
-    private static final String MAIN_SERVICE = "ewm-main-service";
-    private final EventService eventService;
+    private final PublicEventService eventService;
     private final RestStatClient statClient;
 
     @GetMapping

@@ -1,10 +1,10 @@
 package ewm.event.controller;
 
+import ewm.event.service.PrivateEventService;
 import ru.yandex.practicum.dto.event.EventFullDto;
 import ewm.event.dto.EventShortDto;
 import ewm.event.dto.NewEventDto;
 import ewm.event.dto.UpdateEventUserRequest;
-import ewm.event.service.EventService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -18,7 +18,8 @@ import java.util.Collection;
 @Validated
 @RequestMapping("/users/{userId}/events")
 public class PrivateEventController {
-    private final EventService service;
+
+    private final PrivateEventService service;
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
