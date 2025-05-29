@@ -1,7 +1,6 @@
 package ewm.event.service;
 
 import ewm.ParamDto;
-import ewm.client.RestStatClient;
 import ewm.comment.repository.CommentRepository;
 import ewm.event.dto.*;
 import ewm.event.feignClient.CategoryClient;
@@ -40,7 +39,7 @@ public class EventServiceImpl implements InternalEventService, PublicEventServic
 
     private final EventRepository eventRepository;
     private final EventMapper eventMapper;
-    private final RestStatClient statClient;
+//    private final RestStatClient statClient;
     private final UserClient userClient;
     private final CategoryClient categoryClient;
     private final LocationRepository locationRepository;
@@ -281,9 +280,9 @@ public class EventServiceImpl implements InternalEventService, PublicEventServic
             }
         }
         ParamDto paramDto = new ParamDto(earlyPublishDate, LocalDateTime.now(), gettingUris, true);
-        statClient.getStat(paramDto)
-                .stream()
-                .peek(viewStats -> eventDtoMap.get(viewStats.getUri()).setViews(viewStats.getHits()));
+//        statClient.getStat(paramDto)
+//                .stream()
+//                .peek(viewStats -> eventDtoMap.get(viewStats.getUri()).setViews(viewStats.getHits()));
         return eventDtoMap.values().stream().toList();
     }
 
@@ -295,8 +294,8 @@ public class EventServiceImpl implements InternalEventService, PublicEventServic
                     DateTimeFormatter.ofPattern(FORMAT_DATETIME));
         }
         ParamDto paramDto = new ParamDto(publishDate, LocalDateTime.now(), Collections.singletonList(uri), true);
-        Long views = (long) statClient.getStat(paramDto).size();
-        dto.setViews(views);
+//        Long views = (long) statClient.getStat(paramDto).size();
+//        dto.setViews(views);
         return dto;
     }
 

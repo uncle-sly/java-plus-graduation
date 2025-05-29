@@ -1,0 +1,17 @@
+grpc:
+  server:
+    port: 0
+    security:
+      enabled: false
+
+kafka:
+  topic:
+    user-action: stats.user-actions.v1
+  bootstrap:
+    server: localhost:9092
+  key-serializer: org.apache.kafka.common.serialization.LongSerializer
+  value-serializer: ru.practicum.ewm.serializer.GeneralAvroSerializer
+
+logging:
+  level:
+    org.apache.kafka.*: ERROR

@@ -1,7 +1,6 @@
 package ewm.event.controller;
 
 import ewm.ParamHitDto;
-import ewm.client.RestStatClient;
 import ewm.event.service.PublicEventService;
 import ru.yandex.practicum.dto.event.EventFullDto;
 import ewm.event.dto.EventShortDto;
@@ -24,7 +23,7 @@ import static ru.yandex.practicum.utility.Constants.MAIN_SERVICE;
 public class PublicEventController {
 
     private final PublicEventService eventService;
-    private final RestStatClient statClient;
+//    private final RestStatClient statClient;
 
     @GetMapping
     public List<EventShortDto> publicGetAllEvents(@RequestParam(required = false) String text,
@@ -67,6 +66,6 @@ public class PublicEventController {
         endpointHitDto.setUri(request.getRequestURI());
         endpointHitDto.setIp(request.getRemoteAddr());
         endpointHitDto.setTimestamp(LocalDateTime.now());
-        statClient.hit(endpointHitDto);
+//        statClient.hit(endpointHitDto);
     }
 }
