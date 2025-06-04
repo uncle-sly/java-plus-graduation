@@ -69,7 +69,11 @@ public class KafkaRecommendationHandlersImpl implements KafkaRecommendationHandl
         for (long eventId : request.getEventIdList()) {
             double totalWeight = userActionRepository.findByEventId(eventId)
                     .stream()
-                    .mapToDouble(action -> action.getActionType().getScore())
+                    .mapToDouble((ua) -> switch (ua.getActionType()) {
+                        case VIEW -> 0.4;
+                        case REGISTER -> 0.8;
+                        case LIKE -> 1.0;
+                    })
                     .sum();
             responseObserver.onNext(RecommendedEventProto.newBuilder()
                     .setEventId(eventId)
