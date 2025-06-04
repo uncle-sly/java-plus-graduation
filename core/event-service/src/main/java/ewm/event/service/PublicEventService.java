@@ -11,4 +11,8 @@ public interface PublicEventService {
 
     EventFullDto publicGetEvent(long id);
 
+    List<EventFullDto> publicGetRecomendations(Long userId, Integer limit);
+
+    void publicSendLikeToCollector(Long eventId, Long userId);
+
 }

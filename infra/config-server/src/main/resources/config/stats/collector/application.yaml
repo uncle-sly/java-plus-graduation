@@ -8,9 +8,9 @@ kafka:
   topic:
     user-action: stats.user-actions.v1
   bootstrap:
-    server: localhost:9092
+    servers: localhost:9092
   key-serializer: org.apache.kafka.common.serialization.LongSerializer
-  value-serializer: ru.practicum.ewm.serializer.GeneralAvroSerializer
+  value-serializer: serialization.GeneralAvroSerializer
 
 logging:
   level:

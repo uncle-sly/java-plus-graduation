@@ -20,9 +20,6 @@ spring:
 server:
   port: 0
 
-#client:
-#  url: http://localhost:9090
-
 logging:
   level:
     org.springframework.orm.jpa: TRACE
@@ -31,7 +28,6 @@ logging:
     org.springframework.transaction.interceptor: TRACE
     org.hibernate.sql: DEBUG
     org.hibernate.orm.jdbc.bind: TRACE
-
 
 ---
 spring:

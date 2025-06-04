@@ -1,0 +1,31 @@
+grpc:
+  server:
+    port: 0
+    security:
+      enabled: false
+
+kafka:
+  producer:
+    properties:
+      bootstrap:
+        servers: localhost:9092
+      key.serializer: org.apache.kafka.common.serialization.LongSerializer
+      value.serializer: serialization.GeneralAvroSerializer
+      topic: stats.events-similarity.v1
+
+  consumer:
+    properties:
+      bootstrap:
+        servers: localhost:9092
+      key.deserializer: org.apache.kafka.common.serialization.LongDeserializer
+      value.deserializer: deserialization.UserActionDeserializer
+      enable.auto.commit: false
+      group.id: aggregator.group
+      client.id: aggregatorConsumer
+
+      topic: stats.user-actions.v1
+      user-consume-attempt-timeout: 1000
+
+logging:
+  level:
+    org.apache.kafka.*: ERROR

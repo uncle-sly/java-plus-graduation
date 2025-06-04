@@ -33,8 +33,12 @@ public class UserActionController extends UserActionControllerGrpc.UserActionCon
             responseObserver.onCompleted();
         } catch (Exception e) {
             // в случае исключения отправляем ошибку клиенту
-            responseObserver.onError(new StatusRuntimeException(Status.fromThrowable(e)));
-            log.error("UserAction, Ошибка обработки события: {}", request);
+            responseObserver.onError(new StatusRuntimeException(
+                    Status.INTERNAL
+                            .withDescription(e.getLocalizedMessage())
+                            .withCause(e)
+            ));
+            log.error("UserAction, Ошибка обработки события: {} {}", request, e.getMessage(), e);
         }
         log.info("UserAction, обработано событие: {}", request);
     }

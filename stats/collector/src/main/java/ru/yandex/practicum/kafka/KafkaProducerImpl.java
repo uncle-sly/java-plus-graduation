@@ -18,7 +18,7 @@ public class KafkaProducerImpl implements KafkaProducer {
     private final String valueSerializer;
     private Producer<String, SpecificRecordBase> producer;
 
-    public KafkaProducerImpl(@Value("${kafka.bootstrap.server}") String bootstrapServers,
+    public KafkaProducerImpl(@Value("${kafka.bootstrap.servers}") String bootstrapServers,
                              @Value("${kafka.key-serializer}") String keySerializer,
                              @Value("${kafka.value-serializer}") String valueSerializer) {
         this.bootstrapServers = bootstrapServers;
