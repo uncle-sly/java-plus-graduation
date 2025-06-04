@@ -52,7 +52,7 @@ public class KafkaClientConfiguration {
             }
 
             @Override
-            public void close() throws Exception {
+            public void close() {
                 try {
                     eventSimilarityConsumer.commitSync();
                     userActionConsumer.commitSync();

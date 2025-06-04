@@ -7,7 +7,6 @@ import ru.yandex.practicum.dto.event.EventFullDto;
 import ewm.event.dto.EventShortDto;
 import ewm.event.dto.ReqParam;
 import ewm.event.model.EventSort;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
@@ -36,8 +35,7 @@ public class PublicEventController {
                                                   @RequestParam(defaultValue = "false") Boolean onlyAvailable,
                                                   @RequestParam(required = false) EventSort sort,
                                                   @RequestParam(defaultValue = "0") int from,
-                                                  @RequestParam(defaultValue = "10") int size,
-                                                  HttpServletRequest request) {
+                                                  @RequestParam(defaultValue = "10") int size) {
         ReqParam reqParam = ReqParam.builder()
                 .text(text)
                 .categories(categories)
