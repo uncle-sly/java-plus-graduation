@@ -41,50 +41,53 @@ public class AggregationStarter {
      * Подписывается на топики для получения событий
      */
     public void start() {
-        Producer<Long, SpecificRecordBase> kafkaProducer = kafkaClient.getProducer();
-        Consumer<Long, SpecificRecordBase> kafkaConsumer = kafkaClient.getConsumer();
-        Runtime.getRuntime().addShutdownHook(new Thread(kafkaConsumer::wakeup));
+        Producer<Long, SpecificRecordBase> producer = kafkaClient.getProducer();
+        Consumer<Long, SpecificRecordBase> consumer = kafkaClient.getConsumer();
+        Runtime.getRuntime().addShutdownHook(new Thread(consumer::wakeup));
 
         try {
-            kafkaConsumer.subscribe(List.of(consumerTopic));
+            consumer.subscribe(List.of(consumerTopic));
+            log.info("Подписка на UserAction топик: {} ", consumerTopic);
 
             while (true) {
-                ConsumerRecords<Long, SpecificRecordBase> records = kafkaConsumer.poll(pollTimeout);
+                ConsumerRecords<Long, SpecificRecordBase> records = consumer.poll(pollTimeout);
                 if (!records.isEmpty()) {
                     int count = 0;
                     for (ConsumerRecord<Long, SpecificRecordBase> record : records) {
-                        log.info("Получено сообщение: {}", record.value());
+                        log.info("Получено: topic = {}, partition = {}, offset = {}, record = {}",
+                                record.topic(), record.partition(), record.offset(), record.value());
                         List<EventSimilarityAvro> eventsSimilarity = aggregatorService.processUserActions(record.value());
                         eventsSimilarity.forEach(similarity -> {
                             log.info("Отправляем результат: {}", similarity);
-                            kafkaProducer.send(kafkaClient.getProducerRecord(producerTopic, similarity), (metadata, ex) -> {
+                            producer.send(kafkaClient.getProducerRecord(producerTopic, similarity), (metadata, ex) -> {
                                 if (ex != null) {
                                     log.error("Ошибка при отправке сообщения: {}", similarity, ex);
                                 }
                             });
                         });
-                        manageOffsets(record, count, kafkaConsumer);
+                        manageOffsets(record, count, consumer);
                         count++;
                     }
-                    kafkaConsumer.commitAsync();
+                    consumer.commitAsync();
                 }
             }
         } catch (WakeupException ignored) {
         } catch (Exception e) {
-            log.error("{}: Ошибка во время обработки событий от датчиков", AggregationStarter.class.getSimpleName(), e);
+            log.error("Aggregator: Ошибка чтения данных {} : ", e.getMessage(), e);
         } finally {
             try {
-                kafkaProducer.flush();
-                kafkaConsumer.commitSync();
+                producer.flush();
+                consumer.commitSync();
             } finally {
                 log.info("Закрываем Kafka consumer и producer");
-                kafkaConsumer.close();
-                kafkaProducer.close(Duration.ofSeconds(5));
+                consumer.close();
+                producer.close(Duration.ofSeconds(5));
             }
         }
     }
 
-    private static void manageOffsets(ConsumerRecord<Long, SpecificRecordBase> record, int count, Consumer<Long, SpecificRecordBase> consumer) {
+    private static void manageOffsets(ConsumerRecord<Long, SpecificRecordBase> record,
+                                      int count, Consumer<Long, SpecificRecordBase> consumer) {
         // обновляем текущий оффсет для топика-партиции
         currentOffsets.put(
                 new TopicPartition(record.topic(), record.partition()),
@@ -98,4 +101,5 @@ public class AggregationStarter {
             });
         }
     }
+
 }

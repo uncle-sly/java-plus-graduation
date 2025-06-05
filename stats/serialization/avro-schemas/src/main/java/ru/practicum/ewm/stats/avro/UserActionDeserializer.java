@@ -1,6 +1,4 @@
-package deserialization;
-
-import ru.practicum.ewm.stats.avro.UserActionAvro;
+package ru.practicum.ewm.stats.avro;
 
 public class UserActionDeserializer extends BaseAvroDeserializer<UserActionAvro> {
 

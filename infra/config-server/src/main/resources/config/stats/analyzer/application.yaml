@@ -24,31 +24,23 @@ grpc:
       enabled: false
 
 kafka:
-  consumer:
-    user-properties:
-      bootstrap:
-        servers: localhost:9092
-      key.deserializer: org.apache.kafka.common.serialization.VoidDeserializer
-      value.deserializer: deserialization.UserActionDeserializer
-      enable.auto.commit: false
-      group.id: user.actions.analyze
-      client.id: userActionConsumer
+  user-consumer-properties:
+    bootstrap.servers: localhost:9092
+    group.id: user.actions.analyze
+    client.id: userActionConsumer
+    key.deserializer: org.apache.kafka.common.serialization.LongDeserializer
+    value.deserializer: ru.practicum.ewm.stats.avro.UserActionDeserializer
+    enable.auto.commit: false
+  user-topics:
+    - stats.user-actions.v1
 
-      topic.user-action: stats.user-actions.v1
-      user-consume-attempt-timeout: 1000
-
-    similarity-properties:
-      bootstrap:
-        servers: localhost:9092
-      key.deserializer: org.apache.kafka.common.serialization.VoidDeserializer
-      value.deserializer: deserialization.EventSimilarityDeserializer
-      enable.auto.commit: false
-      group.id: similarity.analyze
-      client.id: similarityConsumer
-
-      topic.similarity: stats.events-similarity.v1
-      similarity-consume-attempt-timeout: 1000
-
-logging:
-  level:
-    org.apache.kafka.*: ERROR
+  similarity-consumer-properties:
+    bootstrap.servers: localhost:9092
+    group.id: similarity.analyze
+    client.id: similarityConsumer
+    key.deserializer: org.apache.kafka.common.serialization.LongDeserializer
+    value.deserializer: ru.practicum.ewm.stats.avro.EventSimilarityDeserializer
+    enable.auto.commit: false
+  similarity-topics:
+    - stats.events-similarity.v1
+  consume-attempt-timeout: 1000

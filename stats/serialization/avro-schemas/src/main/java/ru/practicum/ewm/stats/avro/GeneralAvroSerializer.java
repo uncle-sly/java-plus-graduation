@@ -1,4 +1,4 @@
-package serialization;
+package ru.practicum.ewm.stats.avro;
 
 import org.apache.avro.io.BinaryEncoder;
 import org.apache.avro.io.DatumWriter;

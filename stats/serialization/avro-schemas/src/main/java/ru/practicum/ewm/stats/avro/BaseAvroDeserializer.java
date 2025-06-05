@@ -1,4 +1,4 @@
-package deserialization;
+package ru.practicum.ewm.stats.avro;
 
 import org.apache.avro.Schema;
 import org.apache.avro.io.BinaryDecoder;

@@ -10,7 +10,7 @@ kafka:
       bootstrap:
         servers: localhost:9092
       key.serializer: org.apache.kafka.common.serialization.LongSerializer
-      value.serializer: serialization.GeneralAvroSerializer
+      value.serializer: ru.practicum.ewm.stats.avro.GeneralAvroSerializer
       topic: stats.events-similarity.v1
 
   consumer:
@@ -18,7 +18,7 @@ kafka:
       bootstrap:
         servers: localhost:9092
       key.deserializer: org.apache.kafka.common.serialization.LongDeserializer
-      value.deserializer: deserialization.UserActionDeserializer
+      value.deserializer: ru.practicum.ewm.stats.avro.UserActionDeserializer
       enable.auto.commit: false
       group.id: aggregator.group
       client.id: aggregatorConsumer
