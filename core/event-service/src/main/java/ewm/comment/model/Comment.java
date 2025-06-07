@@ -1,7 +1,6 @@
 package ewm.comment.model;
 
 import ewm.event.model.Event;
-//import ewm.user.model.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;

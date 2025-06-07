@@ -21,6 +21,13 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 public class ErrorHandlerControllerAdvice {
 
+    public record ValidationViolation(String fieldName, String message) {
+    }
+    public record ValidationErrorResponse(List<ValidationViolation> validationViolations) {
+    }
+    public record ApiError(String status, String reason, String message, String timestamp) {
+    }
+
     //  перехват эксепшенов валидации
     @ExceptionHandler(ConstraintViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -64,45 +71,28 @@ public class ErrorHandlerControllerAdvice {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ApiError onEntityNotFoundException(final EntityNotFoundException e) {
         log.error("EntityNotFoundException - 404: {}", e.getMessage(), e);
-        StringWriter sw = new StringWriter();
-        PrintWriter pw = new PrintWriter(sw);
-        e.printStackTrace(pw);
-        String stackTrace = sw.toString();
-        return new ApiError("NOT_FOUND", "entity not found", stackTrace, LocalDateTime.now().toString());
+        return new ApiError("NOT_FOUND", "entity not found", getStackTrace(e), LocalDateTime.now().toString());
     }
 
     @ExceptionHandler({DataIntegrityViolationException.class})
     @ResponseStatus(HttpStatus.CONFLICT)
     public ApiError onDataIntegrityViolationException(final DataIntegrityViolationException e) {
         log.error("DataIntegrityViolationException - 409: {}", e.getMessage(), e);
-        StringWriter sw = new StringWriter();
-        PrintWriter pw = new PrintWriter(sw);
-        e.printStackTrace(pw);
-        String stackTrace = sw.toString();
-        return new ApiError("CONFLICT", "Integrity constraint has been violated", stackTrace, LocalDateTime.now().toString());
+        return new ApiError("CONFLICT", "Integrity constraint has been violated", getStackTrace(e), LocalDateTime.now().toString());
     }
 
     @ExceptionHandler(Throwable.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ApiError handleAnyException(final Throwable e) {
         log.error("Error:500; {}", e.getMessage(), e);
-        StringWriter sw = new StringWriter();
-        PrintWriter pw = new PrintWriter(sw);
-        e.printStackTrace(pw);
-        String stackTrace = sw.toString();
-
-        return new ApiError("INTERNAL_SERVER_ERROR", "internal server error", stackTrace, LocalDateTime.now().toString());
+        return new ApiError("INTERNAL_SERVER_ERROR", "internal server error", getStackTrace(e), LocalDateTime.now().toString());
     }
 
     @ExceptionHandler({ValidationException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiError validationException(final ValidationException e) {
         log.error("ValidationException - 400: {}", e.getMessage(), e);
-        StringWriter sw = new StringWriter();
-        PrintWriter pw = new PrintWriter(sw);
-        e.printStackTrace(pw);
-        String stackTrace = sw.toString();
-        return new ApiError("BAD_REQUEST", "validation exception", stackTrace, LocalDateTime.now().toString());
+        return new ApiError("BAD_REQUEST", "validation exception", getStackTrace(e), LocalDateTime.now().toString());
     }
 
     @ExceptionHandler({NotPublishEventException.class,
@@ -112,14 +102,14 @@ public class ErrorHandlerControllerAdvice {
     @ResponseStatus(HttpStatus.CONFLICT)
     public ApiError onNotPublishEventException(final RuntimeException e) {
         log.error("409: {}", e.getMessage(), e);
+        return new ApiError("CONFLICT", "event is not published", getStackTrace(e), LocalDateTime.now().toString());
+    }
+
+    private String getStackTrace(Throwable e) {
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
         e.printStackTrace(pw);
-        String stackTrace = sw.toString();
-        return new ApiError("CONFLICT", "event is not published", stackTrace, LocalDateTime.now().toString());
-    }
-
-    public record ApiError(String status, String reason, String message, String timestamp) {
+        return sw.toString();
     }
 
 }

@@ -1,0 +1,46 @@
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:6543/event
+    username: main
+    password: main
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+  sql:
+    init:
+      mode: always
+      database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+grpc:
+  server:
+    port: 0
+    security:
+      enabled: false
+
+kafka:
+  user-consumer-properties:
+    bootstrap.servers: localhost:9092
+    group.id: user.actions.analyze
+    client.id: userActionConsumer
+    key.deserializer: org.apache.kafka.common.serialization.LongDeserializer
+    value.deserializer: ru.practicum.ewm.stats.avro.UserActionDeserializer
+    enable.auto.commit: false
+  user-topics:
+    - stats.user-actions.v1
+
+  similarity-consumer-properties:
+    bootstrap.servers: localhost:9092
+    group.id: similarity.analyze
+    client.id: similarityConsumer
+    key.deserializer: org.apache.kafka.common.serialization.LongDeserializer
+    value.deserializer: ru.practicum.ewm.stats.avro.EventSimilarityDeserializer
+    enable.auto.commit: false
+  similarity-topics:
+    - stats.events-similarity.v1
+  consume-attempt-timeout: 1000
