@@ -34,7 +34,7 @@ public class AggregationStarter {
     private Duration pollTimeout;
     @Value("${kafka.producer.properties.topic}")
     private String producerTopic;
-    private static final Map<TopicPartition, OffsetAndMetadata> currentOffsets = new HashMap<>();
+    private final Map<TopicPartition, OffsetAndMetadata> currentOffsets = new HashMap<>();
 
     /**
      * Метод для начала процесса агрегации данных.
@@ -71,7 +71,8 @@ public class AggregationStarter {
                     consumer.commitAsync();
                 }
             }
-        } catch (WakeupException ignored) {
+        } catch (WakeupException i) {
+            log.error("WakeupException: {} : ", i.getMessage(), i);
         } catch (Exception e) {
             log.error("Aggregator: Ошибка чтения данных {} : ", e.getMessage(), e);
         } finally {
@@ -86,7 +87,7 @@ public class AggregationStarter {
         }
     }
 
-    private static void manageOffsets(ConsumerRecord<Long, SpecificRecordBase> record,
+    private void manageOffsets(ConsumerRecord<Long, SpecificRecordBase> record,
                                       int count, Consumer<Long, SpecificRecordBase> consumer) {
         // обновляем текущий оффсет для топика-партиции
         currentOffsets.put(

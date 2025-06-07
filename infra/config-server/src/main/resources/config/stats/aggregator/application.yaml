@@ -26,6 +26,12 @@ kafka:
       topic: stats.user-actions.v1
       user-consume-attempt-timeout: 1000
 
+aggregator:
+  action-type-weight:
+    view: 0.4
+    register: 0.8
+    like: 1.0
+
 logging:
   level:
     org.apache.kafka.*: ERROR

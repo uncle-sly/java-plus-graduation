@@ -50,7 +50,7 @@ public class KafkaConsumerHandlersImpl implements KafkaConsumerHandlers {
                 userActionRepository.findByUserIdAndEventId(userActionAvro.getUserId(), userActionAvro.getEventId());
         if (!actions.isEmpty()) {
             UserAction oldAction = actions.getFirst();
-            if (oldAction.getActionType().getScore() < userAction.getActionType().getScore()) {
+            if (oldAction.getActionType().getWeight() < userAction.getActionType().getWeight()) {
                 oldAction.setActionType(userAction.getActionType());
                 oldAction.setTimestamp(userAction.getTimestamp());
                 userActionRepository.save(oldAction);

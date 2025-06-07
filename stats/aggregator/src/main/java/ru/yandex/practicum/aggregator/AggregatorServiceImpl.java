@@ -3,6 +3,7 @@ package ru.yandex.practicum.aggregator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.avro.specific.SpecificRecordBase;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import ru.practicum.ewm.stats.avro.ActionTypeAvro;
 import ru.practicum.ewm.stats.avro.EventSimilarityAvro;
@@ -18,8 +19,15 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class AggregatorServiceImpl implements AggregatorService {
 
+    @Value("${aggregator.action-type-weight.view}")
+    private Double view;
+    @Value("${aggregator.action-type-weight.register}")
+    private Double register;
+    @Value("${aggregator.action-type-weight.like}")
+    private Double like;
+
     // веса, которые пользователи назначили событиям
-    private final Map<Long, Map<Long, Double>> userEventWeights = new HashMap<>();
+    private final UserEventWeightStorage userEventWeights = new UserEventWeightStorage();
     // сумма всех весов от пользователей для каждого события. для вычисления знаменателя в формуле косинусной похожести
     private final Map<Long, Double> eventWeightSums = new HashMap<>();
     // суммы минимальных весов между парами событий(по пользователям). числитель формулы похожести
@@ -32,13 +40,13 @@ public class AggregatorServiceImpl implements AggregatorService {
         Long userId = action.getUserId();
         Double newWeight = getWeight(action.getActionType());
         // старый вес, если был
-        Double oldWeight = userEventWeights.getOrDefault(eventId, new HashMap<>()).getOrDefault(userId, 0.0);
+        Double oldWeight = userEventWeights.getWeight(eventId, userId);
 
         log.info("Обработка действия пользователя: userId={}, eventId={}, type={}, старый вес={}, новый вес={}",
                 userId, eventId, action.getActionType(), oldWeight, newWeight);
 
         if (newWeight <= oldWeight) {
-            log.debug("Вес не изменился: старый={}, новый={}, — перерасчёт не требуется", oldWeight, newWeight);
+            log.debug("максимальным вес не изменился, новый <= старый, старый={}, новый={}, — перерасчёт не требуется", oldWeight, newWeight);
             return List.of();
         }
 
@@ -46,7 +54,6 @@ public class AggregatorServiceImpl implements AggregatorService {
         double weightDiff = newWeight - oldWeight;
         updateUserWeight(eventId, userId, newWeight);
         updateEventWeightSum(eventId, weightDiff);
-
         log.debug("Вес пользователя обновлён. Разница весов: {}", weightDiff);
 
         // ищу другие события, с которыми этот пользователь взаимодействовал
@@ -55,7 +62,6 @@ public class AggregatorServiceImpl implements AggregatorService {
             log.debug("Похожих событий для пользователя {} не найдено", userId);
             return List.of();
         }
-
         log.debug("Найдены похожие события для пользователя {}: {}", userId, similarEventIds);
 
         // пересчет минимальных весов для пар eventId <-> otherEventId по данному пользователю
@@ -71,7 +77,6 @@ public class AggregatorServiceImpl implements AggregatorService {
             double numerator = minWeightSums.getOrDefault(a, Map.of()).getOrDefault(b, 0.0);
             double denominator = Math.sqrt(eventWeightSums.getOrDefault(a, 1.0)) * Math.sqrt(eventWeightSums.getOrDefault(b, 1.0));
             double similarity = numerator / denominator;
-
             log.debug("Вычислена похожесть: событиеA={}, событиеB={}, значение={}", a, b, similarity);
 
             result.add(EventSimilarityAvro.newBuilder()
@@ -88,7 +93,7 @@ public class AggregatorServiceImpl implements AggregatorService {
 
     // обновляю (или добавляю) вес пользователя для конкретного события
     private void updateUserWeight(Long eventId, Long userId, Double newWeight) {
-        userEventWeights.computeIfAbsent(eventId, k -> new HashMap<>()).put(userId, newWeight);
+        userEventWeights.setWeight(eventId, userId, newWeight);
         log.debug("Обновлён вес пользователя {} для события {}: {}", userId, eventId, newWeight);
     }
 
@@ -101,12 +106,11 @@ public class AggregatorServiceImpl implements AggregatorService {
     // поиск событий, с которыми этот же пользователь уже взаимодействовал (кроме текущего). Они потенциально схожи
     private List<Long> getSimilarEvents(Long userId, Long currentEventId) {
         List<Long> eventIds = new ArrayList<>();
-        for (Map.Entry<Long, Map<Long, Double>> entry : userEventWeights.entrySet()) {
-            Long otherEventId = entry.getKey();
-            if (!otherEventId.equals(currentEventId)) {
-                Double weight = entry.getValue().getOrDefault(userId, 0.0);
+        for (Long key : userEventWeights.getAllEventIds()) {
+            if (!key.equals(currentEventId)) {
+                Double weight = userEventWeights.getUsersForEvent(key).getOrDefault(userId, 0.0);
                 if (weight > 0) {
-                    eventIds.add(otherEventId);
+                    eventIds.add(key);
                 }
             }
         }
@@ -117,7 +121,7 @@ public class AggregatorServiceImpl implements AggregatorService {
     // эти значения используются в числителе формулы похожести
     private void updateMinWeightSums(Long eventId, Long userId, Double oldWeight, Double newWeight, List<Long> otherEventIds) {
         for (Long otherEventId : otherEventIds) {
-            Double otherWeight = userEventWeights.getOrDefault(otherEventId, Map.of()).getOrDefault(userId, 0.0);
+            Double otherWeight = userEventWeights.getWeightForOtherEvent(otherEventId, userId);
             long a = Math.min(eventId, otherEventId);
             long b = Math.max(eventId, otherEventId);
             double oldMin = Math.min(oldWeight, otherWeight);
@@ -134,9 +138,9 @@ public class AggregatorServiceImpl implements AggregatorService {
 
     private Double getWeight(ActionTypeAvro type) {
         return switch (type) {
-            case VIEW -> 0.4;
-            case REGISTER -> 0.8;
-            case LIKE -> 1.0;
+            case VIEW -> view;
+            case REGISTER -> register;
+            case LIKE -> like;
         };
     }
 

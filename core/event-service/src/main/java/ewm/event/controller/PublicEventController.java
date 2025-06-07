@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static ru.yandex.practicum.utility.Constants.FORMAT_DATETIME;
+import static ru.yandex.practicum.utility.Constants.REQUEST_HEADER;
 
 @Slf4j
 @RestController
@@ -24,7 +25,6 @@ public class PublicEventController {
 
     private final PublicEventService eventService;
     private final StatsCollectorClient statsCollectorClient;
-
 
     @GetMapping
     public List<EventShortDto> publicGetAllEvents(@RequestParam(required = false) String text,
@@ -51,20 +51,20 @@ public class PublicEventController {
     }
 
     @GetMapping("/{id}")
-    public EventFullDto publicGetEvent(@PathVariable long id, @RequestHeader("X-EWM-USER-ID") long userId) {
+    public EventFullDto publicGetEvent(@PathVariable long id, @RequestHeader(REQUEST_HEADER) long userId) {
         EventFullDto eventFullDto = eventService.publicGetEvent(id);
         statsCollectorClient.collectEventView(userId, id);
         return eventFullDto;
     }
 
     @GetMapping("/recommendations")
-    public List<EventFullDto> publicGetRecomendations(@RequestHeader("X-EWM-USER-ID") long userId, @RequestParam int limit) {
+    public List<EventFullDto> publicGetRecomendations(@RequestHeader(REQUEST_HEADER) long userId, @RequestParam int limit) {
         log.info("запрос рекомендованных мероприятий: {} с лимитом {}", userId, limit);
         return eventService.publicGetRecomendations(userId, limit);
     }
 
     @PutMapping("/{eventId}/like")
-    public void publicSendLikeToCollector(@PathVariable long eventId, @RequestHeader("X-EWM-USER-ID") long userId) {
+    public void publicSendLikeToCollector(@PathVariable long eventId, @RequestHeader(REQUEST_HEADER) long userId) {
         log.info("отправка like мероприятия {} от пользователя {} в Collector", eventId, userId);
         eventService.publicSendLikeToCollector(userId, eventId);
     }
