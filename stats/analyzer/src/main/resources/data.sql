@@ -1,0 +1,5 @@
+DELETE FROM e_similarities;
+DELETE FROM u_actions;
+
+ALTER TABLE e_similarities ALTER COLUMN id RESTART WITH 1;
+ALTER TABLE u_actions ALTER COLUMN id RESTART WITH 1;

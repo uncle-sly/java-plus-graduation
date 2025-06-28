@@ -10,4 +10,5 @@ public final class Constants {
 
     public static final String MAIN_SERVICE = "ewm-main-service";
 
+    public static final String REQUEST_HEADER = "X-EWM-USER-ID";
 }

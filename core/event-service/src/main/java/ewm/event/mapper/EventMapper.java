@@ -21,7 +21,6 @@ public interface EventMapper {
     @Mapping(target = "confirmedRequests", ignore = true)
     List<EventShortDto> toEventShortDto(List<Event> event);
 
-    @Mapping(target = "views", ignore = true)
     @Mapping(target = "confirmedRequests", ignore = true)
     @Mapping(target = "initiator.id", source = "initiatorId")
     @Mapping(target = "commentsCount", ignore = true)

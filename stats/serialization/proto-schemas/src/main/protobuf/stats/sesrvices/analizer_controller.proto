@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package stats.service.dashboard;
+
+
+import "stats/messages/user_predictions_request.proto";
+import "stats/messages/similar_events_request.proto";
+import "stats/messages/interactions_count_request.proto";
+import "stats/messages/recommended_event.proto";
+
+option java_package = "ru.yandex.practicum.grpc.stats.dashboard";
+option java_multiple_files = true;
+
+service RecommendationsController {
+
+  // Получить поток рекомендаций для пользователя
+  rpc GetRecommendationsForUser (stats.message.event.UserPredictionsRequestProto)
+      returns (stream stats.message.event.RecommendedEventProto);
+
+  // Получить поток похожих мероприятий
+  rpc GetSimilarEvents (stats.message.event.SimilarEventsRequestProto)
+      returns (stream stats.message.event.RecommendedEventProto);
+
+  // Получить количество взаимодействий с мероприятиями
+  rpc GetInteractionsCount (stats.message.event.InteractionsCountRequestProto)
+      returns (stream stats.message.event.RecommendedEventProto);
+}

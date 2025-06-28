@@ -1,5 +1,6 @@
 package ru.yandex.practicum.controller;
 
+import ewm.client.StatsCollectorClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +17,7 @@ import java.util.List;
 public class PrivateRequestController {
 
     private final RequestService requestService;
+    private final StatsCollectorClient statsCollectorClient;
 
     @GetMapping("/requests")
     public List<ParticipationRequestDto> getUserRequests(@PathVariable Long userId) {
@@ -26,6 +28,7 @@ public class PrivateRequestController {
     @ResponseStatus(HttpStatus.CREATED)
     public ParticipationRequestDto createRequest(@PathVariable Long userId,
                                                  @RequestParam Long eventId) {
+        statsCollectorClient.collectEventRegistration(userId, eventId);
         return requestService.createRequest(userId, eventId);
     }
 
@@ -44,4 +47,5 @@ public class PrivateRequestController {
                                                               @RequestBody EventRequestStatusUpdateRequest eventRequest) {
         return requestService.updateStatusRequest(userId, eventId, eventRequest);
     }
+
 }

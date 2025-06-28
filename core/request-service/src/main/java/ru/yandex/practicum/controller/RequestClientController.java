@@ -35,5 +35,4 @@ public class RequestClientController implements RequestOperationsClient {
        return requestService.findByRequestIdAndEventId(requestId, eventId);
     }
 
-
 }
